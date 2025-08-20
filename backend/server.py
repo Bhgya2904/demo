@@ -9,12 +9,21 @@ import json
 import os
 from datetime import datetime
 import logging
+import requests
+from dotenv import load_dotenv
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Cyber Breach Forecaster API", version="1.0.0")
+
+# Load environment variables
+load_dotenv()
+
+# VirusTotal API configuration
+VIRUSTOTAL_API_KEY = os.getenv('VIRUSTOTAL_API_KEY')
+VIRUSTOTAL_BASE_URL = "https://www.virustotal.com/vtapi/v2"
 
 # Add CORS middleware
 app.add_middleware(
@@ -72,6 +81,76 @@ class MetricsResponse(BaseModel):
     f1_score: float
     confusion_matrix: List[List[int]]
     training_date: str
+
+# Website Security Check Models
+class WebsiteCheckRequest(BaseModel):
+    """Request schema for website security check."""
+    url: str
+
+class WebsiteCheckResponse(BaseModel):
+    """Response schema for website security check."""
+    url: str
+    verdict: str  # "Safe", "Suspicious", "Malicious", "Unknown"
+    total_scans: int
+    positive_detections: int
+    scan_date: str
+    permalink: str
+    detailed_results: Dict[str, Any]
+    threat_explanation: str
+
+# Network Analysis Models (Enhanced UNSW-NB15)
+class NetworkTrafficRequest(BaseModel):
+    """Request schema for network traffic analysis."""
+    dur: float = Field(..., description="Duration of connection")
+    proto: str = Field(..., description="Protocol type (tcp/udp/icmp)")
+    service: str = Field(..., description="Service type (http/ftp/ssh/etc)")
+    state: str = Field(..., description="Connection state")
+    spkts: int = Field(..., description="Source to destination packets")
+    dpkts: int = Field(..., description="Destination to source packets") 
+    sbytes: int = Field(..., description="Source to destination bytes")
+    dbytes: int = Field(..., description="Destination to source bytes")
+    rate: float = Field(..., description="Connection rate")
+    sttl: int = Field(..., description="Source TTL")
+    dttl: int = Field(..., description="Destination TTL")
+    sload: float = Field(..., description="Source load")
+    dload: float = Field(..., description="Destination load")
+    sloss: int = Field(0, description="Source packets retransmitted")
+    dloss: int = Field(0, description="Destination packets retransmitted")
+    sinpkt: float = Field(..., description="Source interpacket arrival time")
+    dinpkt: float = Field(..., description="Destination interpacket arrival time")
+    sjit: float = Field(0, description="Source jitter")
+    djit: float = Field(0, description="Destination jitter")
+    swin: int = Field(0, description="Source TCP window advertisement")
+    stcpb: int = Field(0, description="Source TCP base sequence number")
+    dtcpb: int = Field(0, description="Destination TCP base sequence number")
+    dwin: int = Field(0, description="Destination TCP window advertisement")
+    tcprtt: float = Field(0, description="TCP round trip time")
+    synack: float = Field(0, description="TCP SYN-ACK time")
+    ackdat: float = Field(0, description="TCP ACK-DAT time")
+    smean: int = Field(0, description="Source packet size mean")
+    dmean: int = Field(0, description="Destination packet size mean")
+    trans_depth: int = Field(0, description="Transaction depth")
+    response_body_len: int = Field(0, description="Response body length")
+    ct_srv_src: int = Field(..., description="Connections to same service from source")
+    ct_state_ttl: int = Field(..., description="Connections with same state and TTL")
+    ct_dst_ltm: int = Field(..., description="Connections to destination in last time")
+    ct_src_dport_ltm: int = Field(0, description="Connections from source to dest port in last time")
+    ct_dst_sport_ltm: int = Field(0, description="Connections from dest to source port in last time")
+    ct_dst_src_ltm: int = Field(0, description="Connections between dest and source in last time")
+    is_ftp_login: int = Field(0, description="FTP login attempt (0/1)")
+    ct_ftp_cmd: int = Field(0, description="FTP command count")
+    ct_flw_http_mthd: int = Field(0, description="HTTP method count in flow")
+    ct_src_ltm: int = Field(0, description="Connections from source in last time")
+    ct_srv_dst: int = Field(0, description="Connections to same service at destination")
+    is_sm_ips_ports: int = Field(0, description="Source and destination IPs/ports are same (0/1)")
+
+class NetworkTrafficResponse(BaseModel):
+    """Response schema for network traffic analysis."""
+    prediction: str  # "Safe Traffic" or "Attack Predicted"
+    confidence: float
+    attack_probability: float
+    detailed_explanation: str
+    feature_importance: Optional[Dict[str, float]] = None
 
 @app.on_event("startup")
 async def load_models():
@@ -305,6 +384,168 @@ async def health_check():
         "models_loaded": len(models) > 0,
         "timestamp": datetime.now().isoformat()
     }
+
+@app.post("/api/check-website", response_model=WebsiteCheckResponse)
+async def check_website_security(request: WebsiteCheckRequest):
+    """Check website security using VirusTotal API."""
+    if not VIRUSTOTAL_API_KEY:
+        raise HTTPException(status_code=500, detail="VirusTotal API key not configured")
+    
+    try:
+        # Ensure URL has protocol
+        url = request.url
+        if not url.startswith(('http://', 'https://')):
+            url = 'https://' + url
+        
+        # First, submit URL for scanning
+        submit_params = {
+            'apikey': VIRUSTOTAL_API_KEY,
+            'url': url
+        }
+        
+        submit_response = requests.post(
+            f"{VIRUSTOTAL_BASE_URL}/url/scan",
+            data=submit_params,
+            timeout=30
+        )
+        submit_response.raise_for_status()
+        submit_data = submit_response.json()
+        
+        if submit_data.get('response_code') != 1:
+            raise HTTPException(status_code=400, detail="Failed to submit URL for scanning")
+        
+        # Get the scan report
+        report_params = {
+            'apikey': VIRUSTOTAL_API_KEY,
+            'resource': url
+        }
+        
+        report_response = requests.get(
+            f"{VIRUSTOTAL_BASE_URL}/url/report",
+            params=report_params,
+            timeout=30
+        )
+        report_response.raise_for_status()
+        report_data = report_response.json()
+        
+        # Process the results
+        if report_data.get('response_code') == 1:
+            positives = report_data.get('positives', 0)
+            total = report_data.get('total', 0)
+            
+            # Determine verdict
+            if positives == 0:
+                verdict = "Safe"
+                threat_explanation = "No security engines detected any threats. The URL appears to be safe."
+            elif positives <= 2:
+                verdict = "Suspicious"
+                threat_explanation = f"A small number ({positives}) of security engines flagged this URL. Exercise caution."
+            else:
+                verdict = "Malicious"
+                threat_explanation = f"{positives} out of {total} security engines detected threats. This URL is likely malicious."
+            
+            return WebsiteCheckResponse(
+                url=url,
+                verdict=verdict,
+                total_scans=total,
+                positive_detections=positives,
+                scan_date=report_data.get('scan_date', ''),
+                permalink=report_data.get('permalink', ''),
+                detailed_results=report_data.get('scans', {}),
+                threat_explanation=threat_explanation
+            )
+        else:
+            # URL not found in database yet, return pending status
+            return WebsiteCheckResponse(
+                url=url,
+                verdict="Unknown",
+                total_scans=0,
+                positive_detections=0,
+                scan_date='',
+                permalink='',
+                detailed_results={},
+                threat_explanation="URL is being analyzed. Please try again in a few moments."
+            )
+            
+    except requests.RequestException as e:
+        raise HTTPException(status_code=500, detail=f"VirusTotal API error: {str(e)}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Analysis failed: {str(e)}")
+
+@app.post("/api/analyze-network", response_model=NetworkTrafficResponse)
+async def analyze_network_traffic(request: NetworkTrafficRequest):
+    """Analyze network traffic for potential intrusions using enhanced UNSW-NB15 model."""
+    if not models:
+        raise HTTPException(status_code=503, detail="ML models not available")
+    
+    try:
+        # Convert request to DataFrame with proper feature order
+        input_data = {}
+        
+        # Map all request fields to feature columns
+        request_dict = request.dict()
+        for feature in feature_columns:
+            if feature in request_dict:
+                input_data[feature] = request_dict[feature]
+            else:
+                # Set default values for missing features
+                input_data[feature] = 0
+        
+        # Create DataFrame
+        df = pd.DataFrame([input_data])
+        
+        # Encode categorical features
+        categorical_columns = ['proto', 'service', 'state']
+        for col in categorical_columns:
+            if col in df.columns and col in label_encoders:
+                try:
+                    # Handle unknown categories by using the most frequent category
+                    le = label_encoders[col]
+                    if df[col].iloc[0] in le.classes_:
+                        df[col] = le.transform([df[col].iloc[0]])
+                    else:
+                        # Use most frequent class (usually 0 for the first class)
+                        df[col] = [0]
+                except Exception:
+                    df[col] = [0]
+        
+        # Scale features
+        X_scaled = scaler.transform(df)
+        
+        # Make predictions
+        rf_pred_proba = models['rf'].predict_proba(X_scaled)[0, 1]
+        xgb_pred_proba = models['xgb'].predict_proba(X_scaled)[0, 1]
+        
+        # Ensemble prediction
+        ensemble_proba = (rf_pred_proba * 0.6) + (xgb_pred_proba * 0.4)
+        prediction = int(ensemble_proba > 0.5)
+        
+        # Generate response
+        if prediction == 0:
+            result = "Safe Traffic"
+            explanation = "The network traffic pattern appears normal with no signs of malicious activity."
+        else:
+            result = "Attack Predicted"
+            explanation = f"The network traffic shows patterns consistent with malicious activity. Confidence: {ensemble_proba:.2%}. This could indicate various types of network attacks including reconnaissance, exploitation attempts, or data exfiltration."
+        
+        # Feature importance (simplified)
+        feature_importance = {}
+        if hasattr(models['rf'], 'feature_importances_'):
+            importances = models['rf'].feature_importances_
+            for i, feature in enumerate(feature_columns[:10]):  # Top 10 features
+                if i < len(importances):
+                    feature_importance[feature] = float(importances[i])
+        
+        return NetworkTrafficResponse(
+            prediction=result,
+            confidence=float(abs(ensemble_proba - 0.5) * 2),  # Convert to 0-1 confidence
+            attack_probability=float(ensemble_proba),
+            detailed_explanation=explanation,
+            feature_importance=feature_importance
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Network analysis failed: {str(e)}")
 
 if __name__ == "__main__":
     import uvicorn
