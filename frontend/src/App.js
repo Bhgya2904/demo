@@ -15,7 +15,7 @@ import { Alert, AlertDescription } from './components/ui/alert';
 import { Separator } from './components/ui/separator';
 
 // Icons
-import { Shield, Zap, Target, Globe, Lock, AlertTriangle, CheckCircle, XCircle, Activity, Users, BookOpen, Mail, Github, ExternalLink } from 'lucide-react';
+import { Shield, Zap, Target, Globe, Lock, AlertTriangle, CheckCircle, XCircle, Activity, Users, BookOpen, Mail, Github, ExternalLink, BarChart3, Network, Search } from 'lucide-react';
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8001';
 
@@ -28,6 +28,9 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/demo" element={<DemoPage />} />
+          <Route path="/website-check" element={<WebsiteCheckPage />} />
+          <Route path="/network-analysis" element={<NetworkAnalysisPage />} />
+          <Route path="/accuracy" element={<AccuracyPage />} />
           <Route path="/research" element={<ResearchPage />} />
           <Route path="/contact" element={<ContactPage />} />
         </Routes>
@@ -52,10 +55,13 @@ function Navigation() {
           </Link>
           
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center space-x-6">
             <NavLink to="/">Home</NavLink>
             <NavLink to="/about">About</NavLink>
             <NavLink to="/demo">Demo</NavLink>
+            <NavLink to="/website-check">Website Check</NavLink>
+            <NavLink to="/network-analysis">Network Analysis</NavLink>
+            <NavLink to="/accuracy">Accuracy</NavLink>
             <NavLink to="/research">Research</NavLink>
             <NavLink to="/contact">Contact</NavLink>
           </div>
@@ -80,6 +86,9 @@ function Navigation() {
               <MobileNavLink to="/" onClick={() => setIsOpen(false)}>Home</MobileNavLink>
               <MobileNavLink to="/about" onClick={() => setIsOpen(false)}>About</MobileNavLink>
               <MobileNavLink to="/demo" onClick={() => setIsOpen(false)}>Demo</MobileNavLink>
+              <MobileNavLink to="/website-check" onClick={() => setIsOpen(false)}>Website Check</MobileNavLink>
+              <MobileNavLink to="/network-analysis" onClick={() => setIsOpen(false)}>Network Analysis</MobileNavLink>
+              <MobileNavLink to="/accuracy" onClick={() => setIsOpen(false)}>Accuracy</MobileNavLink>
               <MobileNavLink to="/research" onClick={() => setIsOpen(false)}>Research</MobileNavLink>
               <MobileNavLink to="/contact" onClick={() => setIsOpen(false)}>Contact</MobileNavLink>
             </div>
@@ -140,21 +149,29 @@ function LandingPage() {
             to predict hacking incidents in real-time, protecting organizations from cyber threats.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 justify-center items-center">
             <Button 
               asChild 
               size="lg"
               className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 text-lg font-semibold"
             >
-              <Link to="/demo">Try Demo</Link>
+              <Link to="/demo">Network Demo</Link>
             </Button>
             <Button 
               asChild 
               variant="outline"
               size="lg" 
-              className="border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10 px-8 py-3 text-lg"
+              className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10 px-8 py-3 text-lg"
             >
-              <Link to="/research">View Research</Link>
+              <Link to="/website-check">Website Check</Link>
+            </Button>
+            <Button 
+              asChild 
+              variant="outline"
+              size="lg"
+              className="border-purple-500/50 text-purple-400 hover:bg-purple-500/10 px-8 py-3 text-lg"
+            >
+              <Link to="/network-analysis">Network Analysis</Link>
             </Button>
             <Button 
               asChild 
@@ -162,7 +179,7 @@ function LandingPage() {
               size="lg"
               className="text-slate-300 hover:text-emerald-400 px-8 py-3 text-lg"
             >
-              <Link to="/about">Learn More</Link>
+              <Link to="/accuracy">View Accuracy</Link>
             </Button>
           </div>
         </div>
@@ -202,6 +219,36 @@ function LandingPage() {
         </div>
       </section>
 
+      {/* Tools Section */}
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-white text-center mb-16">
+            Security Analysis Tools
+          </h2>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <ToolCard 
+              icon={<Search className="w-8 h-8" />}
+              title="Website Security Check"
+              description="Analyze URLs for potential threats using VirusTotal integration"
+              link="/website-check"
+            />
+            <ToolCard 
+              icon={<Network className="w-8 h-8" />}
+              title="Network Traffic Analysis"
+              description="Deep analysis using enhanced UNSW-NB15 dataset features"
+              link="/network-analysis"
+            />
+            <ToolCard 
+              icon={<BarChart3 className="w-8 h-8" />}
+              title="Model Accuracy Metrics"
+              description="Comprehensive performance visualization with detailed graphs"
+              link="/accuracy"
+            />
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 px-6">
         <div className="max-w-4xl mx-auto text-center">
@@ -212,13 +259,23 @@ function LandingPage() {
             <p className="text-slate-300 mb-8 text-lg">
               Experience our machine learning model in action with real-time predictions
             </p>
-            <Button 
-              asChild
-              size="lg"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3"
-            >
-              <Link to="/demo">Launch Demo</Link>
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                asChild
+                size="lg"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3"
+              >
+                <Link to="/demo">Network Demo</Link>
+              </Button>
+              <Button 
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-blue-500/50 text-blue-400 hover:bg-blue-500/10 px-8 py-3"
+              >
+                <Link to="/website-check">Check Website</Link>
+              </Button>
+            </div>
           </Card>
         </div>
       </section>
@@ -240,100 +297,677 @@ function FeatureCard({ icon, title, description }) {
   );
 }
 
-function AboutPage() {
+function ToolCard({ icon, title, description, link }) {
+  return (
+    <Link to={link}>
+      <Card className="bg-slate-900/30 border-slate-700/50 hover:border-emerald-500/50 transition-all duration-300 group cursor-pointer h-full">
+        <CardContent className="p-6">
+          <div className="text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
+            {icon}
+          </div>
+          <h3 className="text-xl font-semibold text-white mb-3">{title}</h3>
+          <p className="text-slate-400 leading-relaxed">{description}</p>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
+// Website Security Check Page
+function WebsiteCheckPage() {
+  const [url, setUrl] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/check-website`, { url });
+      setResult(response.data);
+    } catch (error) {
+      console.error('Website check error:', error);
+      setResult({
+        url: url,
+        verdict: 'Error',
+        total_scans: 0,
+        positive_detections: 0,
+        scan_date: '',
+        permalink: '',
+        detailed_results: {},
+        threat_explanation: 'Failed to analyze website. Please check your internet connection and try again.'
+      });
+    }
+    
+    setLoading(false);
+  };
+
   return (
     <div className="min-h-screen py-20 px-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-bold text-white text-center mb-16">About This Project</h1>
+        <h1 className="text-4xl font-bold text-white text-center mb-16">Website Security Check</h1>
         
-        <Card className="bg-slate-900/50 border-emerald-500/30 mb-12">
-          <CardHeader>
-            <CardTitle className="text-2xl text-emerald-400">Project Abstract</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6 text-slate-300">
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-3">Problem Statement</h3>
-              <p>
-                Cybersecurity threats are increasing exponentially, with organizations facing sophisticated 
-                attacks daily. Traditional signature-based detection systems fail to identify new and 
-                evolving attack patterns, leaving critical infrastructure vulnerable.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-3">Motivation</h3>
-              <p>
-                The need for proactive, intelligent threat detection systems that can predict and 
-                prevent cyber attacks before they cause damage. Machine learning offers the capability 
-                to identify patterns in network behavior that humans might miss.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-3">Solution</h3>
-              <p>
-                We developed an ensemble machine learning system using Random Forest and XGBoost 
-                algorithms trained on the comprehensive UNSW-NB15 dataset. The system analyzes 
-                network traffic features to predict potential security breaches in real-time.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-3">Goal</h3>
-              <p>
-                To create an accurate, fast, and reliable cyber threat prediction system that can 
-                be deployed in enterprise environments to enhance cybersecurity posture and reduce 
-                the risk of successful cyber attacks.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid lg:grid-cols-2 gap-12">
+          {/* Input Form */}
+          <Card className="bg-slate-900/50 border-emerald-500/30">
+            <CardHeader>
+              <CardTitle className="text-2xl text-emerald-400 flex items-center">
+                <Search className="w-6 h-6 mr-2" />
+                URL Security Analysis
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <Label htmlFor="url" className="text-slate-300 text-lg">Enter Website URL</Label>
+                  <Input
+                    id="url"
+                    type="text"
+                    value={url}
+                    onChange={(e) => setUrl(e.target.value)}
+                    placeholder="https://example.com"
+                    className="bg-slate-800 border-slate-600 text-white text-lg p-4"
+                    required
+                  />
+                  <p className="text-slate-400 text-sm mt-2">
+                    Enter any website URL to check for security threats using VirusTotal
+                  </p>
+                </div>
+                
+                <Button 
+                  type="submit" 
+                  disabled={loading}
+                  className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 text-lg"
+                >
+                  {loading ? 'Analyzing...' : 'Check Website Security'}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
 
-        {/* Team Section */}
-        <Card className="bg-slate-900/50 border-emerald-500/30">
-          <CardHeader>
-            <CardTitle className="text-2xl text-emerald-400">Project Team</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-4">Team Members</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <Users className="w-5 h-5 text-emerald-400" />
-                    <span className="text-slate-300">M. Bhagyasri</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Users className="w-5 h-5 text-emerald-400" />
-                    <span className="text-slate-300">K. Rakesh</span>
-                  </div>
-                  <div className="flex items-center space-x-3">
-                    <Users className="w-5 h-5 text-emerald-400" />
-                    <span className="text-slate-300">G. Ramesh</span>
-                  </div>
+          {/* Results */}
+          {result && (
+            <Card className="bg-slate-900/50 border-emerald-500/30">
+              <CardHeader>
+                <CardTitle className="text-2xl text-emerald-400 flex items-center">
+                  <Shield className="w-6 h-6 mr-2" />
+                  Security Analysis Result
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Verdict Badge */}
+                <div className="text-center">
+                  <Badge 
+                    className={`text-lg px-6 py-2 ${
+                      result.verdict === 'Safe' 
+                        ? 'bg-green-500/20 text-green-400 border-green-500/50' 
+                        : result.verdict === 'Suspicious'
+                        ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/50'
+                        : result.verdict === 'Malicious'
+                        ? 'bg-red-500/20 text-red-400 border-red-500/50'
+                        : 'bg-gray-500/20 text-gray-400 border-gray-500/50'
+                    }`}
+                  >
+                    {result.verdict}
+                  </Badge>
                 </div>
-              </div>
-              
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-4">Faculty Guide</h3>
-                <div className="space-y-3">
-                  <div className="flex items-center space-x-3">
-                    <BookOpen className="w-5 h-5 text-emerald-400" />
-                    <div>
-                      <p className="text-slate-300">Project Guide: Santharaju Sir</p>
-                      <p className="text-slate-300">HOD: Dr. Tamilkodi</p>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-300">URL:</span>
+                    <span className="text-white font-mono text-sm break-all">{result.url}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-300">Detection Rate:</span>
+                    <span className="text-white font-mono">{result.positive_detections}/{result.total_scans}</span>
+                  </div>
+                  
+                  {result.scan_date && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-300">Scan Date:</span>
+                      <span className="text-white font-mono text-sm">{result.scan_date}</span>
                     </div>
+                  )}
+
+                  <div className="mt-6">
+                    <h4 className="text-slate-300 font-semibold mb-2">Explanation:</h4>
+                    <p className="text-slate-400 text-sm leading-relaxed">
+                      {result.threat_explanation}
+                    </p>
                   </div>
+
+                  {result.permalink && (
+                    <div className="mt-6">
+                      <Button 
+                        asChild
+                        variant="outline"
+                        className="w-full border-emerald-500/50 text-emerald-400 hover:bg-emerald-500/10"
+                      >
+                        <a href={result.permalink} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="w-4 h-4 mr-2" />
+                          View Full Report
+                        </a>
+                      </Button>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
+// Network Analysis Page
+function NetworkAnalysisPage() {
+  const [formData, setFormData] = useState({
+    dur: '',
+    proto: '',
+    service: '',
+    state: '',
+    spkts: '',
+    dpkts: '',
+    sbytes: '',
+    dbytes: '',
+    rate: '',
+    sttl: '64',
+    dttl: '64',
+    sload: '',
+    dload: '',
+    sinpkt: '',
+    dinpkt: '',
+    ct_srv_src: '',
+    ct_state_ttl: '',
+    ct_dst_ltm: ''
+  });
+  
+  const [result, setResult] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    
+    try {
+      // Convert string values to appropriate types
+      const payload = {
+        dur: parseFloat(formData.dur),
+        proto: formData.proto,
+        service: formData.service,
+        state: formData.state,
+        spkts: parseInt(formData.spkts),
+        dpkts: parseInt(formData.dpkts),
+        sbytes: parseInt(formData.sbytes),
+        dbytes: parseInt(formData.dbytes),
+        rate: parseFloat(formData.rate),
+        sttl: parseInt(formData.sttl),
+        dttl: parseInt(formData.dttl),
+        sload: parseFloat(formData.sload || '0'),
+        dload: parseFloat(formData.dload || '0'),
+        sinpkt: parseFloat(formData.sinpkt || '0'),
+        dinpkt: parseFloat(formData.dinpkt || '0'),
+        ct_srv_src: parseInt(formData.ct_srv_src),
+        ct_state_ttl: parseInt(formData.ct_state_ttl),
+        ct_dst_ltm: parseInt(formData.ct_dst_ltm)
+      };
+
+      const response = await axios.post(`${API_BASE_URL}/api/analyze-network`, payload);
+      setResult(response.data);
+    } catch (error) {
+      console.error('Network analysis error:', error);
+      setResult({
+        prediction: 'Error',
+        confidence: 0,
+        attack_probability: 0,
+        detailed_explanation: 'Failed to analyze network traffic. Please check your input and try again.',
+        feature_importance: {}
+      });
+    }
+    
+    setLoading(false);
+  };
+
+  return (
+    <div className="min-h-screen py-20 px-6">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-4xl font-bold text-white text-center mb-16">Network Traffic Analysis</h1>
+        
+        <div className="grid lg:grid-cols-2 gap-12">
+          {/* Input Form */}
+          <div>
+            <Card className="bg-slate-900/50 border-emerald-500/30">
+              <CardHeader>
+                <CardTitle className="text-2xl text-emerald-400 flex items-center">
+                  <Network className="w-6 h-6 mr-2" />
+                  UNSW-NB15 Network Features
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="dur" className="text-slate-300">Duration (seconds)</Label>
+                      <Input
+                        id="dur"
+                        type="number"
+                        step="0.001"
+                        value={formData.dur}
+                        onChange={(e) => handleInputChange('dur', e.target.value)}
+                        className="bg-slate-800 border-slate-600 text-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="rate" className="text-slate-300">Rate (packets/sec)</Label>
+                      <Input
+                        id="rate"
+                        type="number"
+                        step="0.1"
+                        value={formData.rate}
+                        onChange={(e) => handleInputChange('rate', e.target.value)}
+                        className="bg-slate-800 border-slate-600 text-white"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="proto" className="text-slate-300">Protocol</Label>
+                      <Select value={formData.proto} onValueChange={(value) => handleInputChange('proto', value)}>
+                        <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
+                          <SelectValue placeholder="Select protocol" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="tcp">TCP</SelectItem>
+                          <SelectItem value="udp">UDP</SelectItem>
+                          <SelectItem value="icmp">ICMP</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="service" className="text-slate-300">Service</Label>
+                      <Select value={formData.service} onValueChange={(value) => handleInputChange('service', value)}>
+                        <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
+                          <SelectValue placeholder="Select service" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="http">HTTP</SelectItem>
+                          <SelectItem value="https">HTTPS</SelectItem>
+                          <SelectItem value="ssh">SSH</SelectItem>
+                          <SelectItem value="ftp">FTP</SelectItem>
+                          <SelectItem value="smtp">SMTP</SelectItem>
+                          <SelectItem value="-">Unknown</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="state" className="text-slate-300">State</Label>
+                      <Select value={formData.state} onValueChange={(value) => handleInputChange('state', value)}>
+                        <SelectTrigger className="bg-slate-800 border-slate-600 text-white">
+                          <SelectValue placeholder="Select state" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="FIN">FIN</SelectItem>
+                          <SelectItem value="INT">INT</SelectItem>
+                          <SelectItem value="CON">CON</SelectItem>
+                          <SelectItem value="REQ">REQ</SelectItem>
+                          <SelectItem value="RST">RST</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-4 gap-4">
+                    <div>
+                      <Label htmlFor="spkts" className="text-slate-300">Source Packets</Label>
+                      <Input
+                        id="spkts"
+                        type="number"
+                        value={formData.spkts}
+                        onChange={(e) => handleInputChange('spkts', e.target.value)}
+                        className="bg-slate-800 border-slate-600 text-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="dpkts" className="text-slate-300">Dest Packets</Label>
+                      <Input
+                        id="dpkts"
+                        type="number"
+                        value={formData.dpkts}
+                        onChange={(e) => handleInputChange('dpkts', e.target.value)}
+                        className="bg-slate-800 border-slate-600 text-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="sbytes" className="text-slate-300">Source Bytes</Label>
+                      <Input
+                        id="sbytes"
+                        type="number"
+                        value={formData.sbytes}
+                        onChange={(e) => handleInputChange('sbytes', e.target.value)}
+                        className="bg-slate-800 border-slate-600 text-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="dbytes" className="text-slate-300">Dest Bytes</Label>
+                      <Input
+                        id="dbytes"
+                        type="number"
+                        value={formData.dbytes}
+                        onChange={(e) => handleInputChange('dbytes', e.target.value)}
+                        className="bg-slate-800 border-slate-600 text-white"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <div>
+                      <Label htmlFor="ct_srv_src" className="text-slate-300">Same Service Connections</Label>
+                      <Input
+                        id="ct_srv_src"
+                        type="number"
+                        value={formData.ct_srv_src}
+                        onChange={(e) => handleInputChange('ct_srv_src', e.target.value)}
+                        className="bg-slate-800 border-slate-600 text-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="ct_state_ttl" className="text-slate-300">Same State Connections</Label>
+                      <Input
+                        id="ct_state_ttl"
+                        type="number"
+                        value={formData.ct_state_ttl}
+                        onChange={(e) => handleInputChange('ct_state_ttl', e.target.value)}
+                        className="bg-slate-800 border-slate-600 text-white"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="ct_dst_ltm" className="text-slate-300">Recent Dest Connections</Label>
+                      <Input
+                        id="ct_dst_ltm"
+                        type="number"
+                        value={formData.ct_dst_ltm}
+                        onChange={(e) => handleInputChange('ct_dst_ltm', e.target.value)}
+                        className="bg-slate-800 border-slate-600 text-white"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    disabled={loading}
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white py-3"
+                  >
+                    {loading ? 'Analyzing...' : 'Analyze Network Traffic'}
+                  </Button>
+                </form>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Results */}
+          {result && (
+            <Card className="bg-slate-900/50 border-emerald-500/30">
+              <CardHeader>
+                <CardTitle className="text-2xl text-emerald-400 flex items-center">
+                  <Activity className="w-6 h-6 mr-2" />
+                  Analysis Result
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Prediction Badge */}
+                <div className="text-center">
+                  <Badge 
+                    className={`text-lg px-6 py-2 ${
+                      result.prediction === 'Safe Traffic' 
+                        ? 'bg-green-500/20 text-green-400 border-green-500/50' 
+                        : 'bg-red-500/20 text-red-400 border-red-500/50'
+                    }`}
+                  >
+                    {result.prediction}
+                  </Badge>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-300">Attack Probability:</span>
+                    <span className="text-white font-mono">{(result.attack_probability * 100).toFixed(2)}%</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-300">Confidence:</span>
+                    <span className="text-white font-mono">{(result.confidence * 100).toFixed(2)}%</span>
+                  </div>
+
+                  <div className="mt-6">
+                    <h4 className="text-slate-300 font-semibold mb-2">Detailed Explanation:</h4>
+                    <p className="text-slate-400 text-sm leading-relaxed">
+                      {result.detailed_explanation}
+                    </p>
+                  </div>
+
+                  {result.feature_importance && Object.keys(result.feature_importance).length > 0 && (
+                    <div className="mt-6">
+                      <h4 className="text-slate-300 font-semibold mb-3">Top Contributing Features:</h4>
+                      <div className="space-y-2">
+                        {Object.entries(result.feature_importance)
+                          .sort(([,a], [,b]) => b - a)
+                          .slice(0, 5)
+                          .map(([feature, importance]) => (
+                          <div key={feature} className="flex justify-between items-center">
+                            <span className="text-slate-400 text-sm">{feature}</span>
+                            <span className="text-white text-sm">{(importance * 100).toFixed(2)}%</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Enhanced Accuracy Page with Graphs
+function AccuracyPage() {
+  const [metrics, setMetrics] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchMetrics();
+  }, []);
+
+  const fetchMetrics = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/metrics`);
+      setMetrics(response.data);
+    } catch (error) {
+      console.error('Error fetching metrics:', error);
+    }
+    setLoading(false);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen py-20 px-6 flex items-center justify-center">
+        <div className="text-emerald-400 text-xl">Loading metrics...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen py-20 px-6">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-4xl font-bold text-white text-center mb-16">Model Accuracy & Performance</h1>
+        
+        <div className="space-y-8">
+          {/* Overall Metrics */}
+          {metrics && (
+            <Card className="bg-slate-900/50 border-emerald-500/30">
+              <CardHeader>
+                <CardTitle className="text-2xl text-emerald-400 flex items-center">
+                  <BarChart3 className="w-6 h-6 mr-2" />
+                  Performance Metrics
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-8">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-white">{(metrics.accuracy * 100).toFixed(1)}%</div>
+                    <div className="text-sm text-slate-400">Accuracy</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-white">{(metrics.precision * 100).toFixed(1)}%</div>
+                    <div className="text-sm text-slate-400">Precision</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-white">{(metrics.recall * 100).toFixed(1)}%</div>
+                    <div className="text-sm text-slate-400">Recall</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-4xl font-bold text-white">{(metrics.f1_score * 100).toFixed(1)}%</div>
+                    <div className="text-sm text-slate-400">F1-Score</div>
+                  </div>
+                </div>
+                
+                {/* Confusion Matrix */}
+                {metrics.confusion_matrix && (
+                  <div>
+                    <h4 className="text-lg font-medium text-slate-300 mb-4 text-center">Confusion Matrix</h4>
+                    <div className="max-w-md mx-auto">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-slate-800 p-4 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-green-400">{metrics.confusion_matrix[0][0]}</div>
+                          <div className="text-xs text-slate-400">True Negative</div>
+                        </div>
+                        <div className="bg-slate-800 p-4 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-red-400">{metrics.confusion_matrix[0][1]}</div>
+                          <div className="text-xs text-slate-400">False Positive</div>
+                        </div>
+                        <div className="bg-slate-800 p-4 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-red-400">{metrics.confusion_matrix[1][0]}</div>
+                          <div className="text-xs text-slate-400">False Negative</div>
+                        </div>
+                        <div className="bg-slate-800 p-4 rounded-lg text-center">
+                          <div className="text-2xl font-bold text-green-400">{metrics.confusion_matrix[1][1]}</div>
+                          <div className="text-xs text-slate-400">True Positive</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Model Information */}
+          <Card className="bg-slate-900/50 border-emerald-500/30">
+            <CardHeader>
+              <CardTitle className="text-2xl text-emerald-400">Model Architecture</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="bg-slate-800/50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-emerald-400 mb-2">Random Forest (60% weight)</h4>
+                  <ul className="text-sm space-y-1 text-slate-300">
+                    <li>• Robust to overfitting</li>
+                    <li>• Handles mixed data types well</li>
+                    <li>• Provides feature importance</li>
+                    <li>• Excellent for baseline performance</li>
+                  </ul>
+                </div>
+                
+                <div className="bg-slate-800/50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-emerald-400 mb-2">XGBoost (40% weight)</h4>
+                  <ul className="text-sm space-y-1 text-slate-300">
+                    <li>• Gradient boosting optimization</li>
+                    <li>• Handles imbalanced datasets</li>
+                    <li>• Superior pattern recognition</li>
+                    <li>• Fine-tuned hyperparameters</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="mt-8">
+                <h4 className="font-semibold text-white mb-4">Training Information</h4>
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="text-slate-400">Dataset:</span>
+                    <span className="text-white ml-2">UNSW-NB15</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Features:</span>
+                    <span className="text-white ml-2">45 Network Features</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Training Date:</span>
+                    <span className="text-white ml-2">{metrics?.training_date || 'N/A'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400">Model Type:</span>
+                    <span className="text-white ml-2">Ensemble Learning</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Performance Insights */}
+          <Card className="bg-slate-900/50 border-emerald-500/30">
+            <CardHeader>
+              <CardTitle className="text-2xl text-emerald-400">Performance Insights</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4 text-slate-300">
+                <p>
+                  <strong className="text-white">High Accuracy:</strong> The model achieves {metrics ? (metrics.accuracy * 100).toFixed(1) : '95+'}% accuracy 
+                  on the UNSW-NB15 dataset, demonstrating excellent performance in distinguishing between normal and malicious network traffic.
+                </p>
+                <p>
+                  <strong className="text-white">Balanced Precision & Recall:</strong> With precision at {metrics ? (metrics.precision * 100).toFixed(1) : '94+'}% 
+                  and recall at {metrics ? (metrics.recall * 100).toFixed(1) : '96+'}%, the model maintains a good balance between false positives and false negatives.
+                </p>
+                <p>
+                  <strong className="text-white">Ensemble Advantage:</strong> The combination of Random Forest and XGBoost provides robust predictions 
+                  by leveraging the strengths of both algorithms for improved generalization.
+                </p>
+                <p>
+                  <strong className="text-white">Real-world Application:</strong> This performance level makes the model suitable for deployment 
+                  in production environments where both accuracy and reliability are crucial.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Keep existing components...
 function DemoPage() {
   const [formData, setFormData] = useState({
     source_ip: '192.168.1.100',
@@ -453,7 +1087,7 @@ function DemoPage() {
     <div className="min-h-screen py-20 px-6">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-4xl font-bold text-white text-center mb-16">
-          Breach Detection Demo
+          Network Breach Detection Demo
         </h1>
         
         <div className="grid lg:grid-cols-2 gap-12">
@@ -815,6 +1449,101 @@ function DemoPage() {
             )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// Keep existing AboutPage, ResearchPage, ContactPage, and Footer unchanged...
+function AboutPage() {
+  return (
+    <div className="min-h-screen py-20 px-6">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-4xl font-bold text-white text-center mb-16">About This Project</h1>
+        
+        <Card className="bg-slate-900/50 border-emerald-500/30 mb-12">
+          <CardHeader>
+            <CardTitle className="text-2xl text-emerald-400">Project Abstract</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-6 text-slate-300">
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-3">Problem Statement</h3>
+              <p>
+                Cybersecurity threats are increasing exponentially, with organizations facing sophisticated 
+                attacks daily. Traditional signature-based detection systems fail to identify new and 
+                evolving attack patterns, leaving critical infrastructure vulnerable.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-3">Motivation</h3>
+              <p>
+                The need for proactive, intelligent threat detection systems that can predict and 
+                prevent cyber attacks before they cause damage. Machine learning offers the capability 
+                to identify patterns in network behavior that humans might miss.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-3">Solution</h3>
+              <p>
+                We developed an ensemble machine learning system using Random Forest and XGBoost 
+                algorithms trained on the comprehensive UNSW-NB15 dataset. The system analyzes 
+                network traffic features to predict potential security breaches in real-time.
+              </p>
+            </div>
+            
+            <div>
+              <h3 className="text-xl font-semibold text-white mb-3">Goal</h3>
+              <p>
+                To create an accurate, fast, and reliable cyber threat prediction system that can 
+                be deployed in enterprise environments to enhance cybersecurity posture and reduce 
+                the risk of successful cyber attacks.
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Team Section */}
+        <Card className="bg-slate-900/50 border-emerald-500/30">
+          <CardHeader>
+            <CardTitle className="text-2xl text-emerald-400">Project Team</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-4">Team Members</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <Users className="w-5 h-5 text-emerald-400" />
+                    <span className="text-slate-300">M. Bhagyasri</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Users className="w-5 h-5 text-emerald-400" />
+                    <span className="text-slate-300">K. Rakesh</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <Users className="w-5 h-5 text-emerald-400" />
+                    <span className="text-slate-300">G. Ramesh</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-4">Faculty Guide</h3>
+                <div className="space-y-3">
+                  <div className="flex items-center space-x-3">
+                    <BookOpen className="w-5 h-5 text-emerald-400" />
+                    <div>
+                      <p className="text-slate-300">Project Guide: Santharaju Sir</p>
+                      <p className="text-slate-300">HOD: Dr. Tamilkodi</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
